@@ -1,0 +1,4 @@
+amaze_order_id,status
+1001,waiting_confirm_received
+1002,confirmed
+1003,waiting_confirm_received

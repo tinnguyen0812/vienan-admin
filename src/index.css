@@ -1,0 +1,86 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ─── Base ──────────────────────────────────────────────── */
+@layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-brand-gray font-sans text-sm text-brand-black;
+    min-height: 100dvh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-semibold tracking-tight;
+  }
+
+  /* Custom scrollbar – minimal */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb {
+    @apply rounded-full bg-brand-border;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-brand-muted;
+  }
+}
+
+/* ─── Components ─────────────────────────────────────────── */
+@layer components {
+  /* Card */
+  .card {
+    @apply rounded-xl bg-white shadow-card border border-brand-border;
+  }
+
+  /* Form input */
+  .form-input {
+    @apply w-full rounded-lg border border-brand-border bg-white px-3.5 py-2.5 text-sm
+           text-brand-black placeholder:text-brand-muted
+           outline-none ring-0
+           transition-all duration-150
+           focus:border-brand-black focus:ring-1 focus:ring-brand-black/10;
+  }
+
+  /* Primary button */
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg bg-brand-black px-4 py-2.5 text-sm font-medium text-white
+           transition-all duration-150
+           hover:bg-neutral-800 active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Ghost button */
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg px-4 py-2.5 text-sm font-medium text-brand-muted
+           transition-all duration-150
+           hover:bg-brand-gray hover:text-brand-black active:scale-[0.98];
+  }
+
+  /* Outline button */
+  .btn-outline {
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg border border-brand-border px-4 py-2.5 text-sm font-medium text-brand-black
+           transition-all duration-150
+           hover:bg-brand-gray active:scale-[0.98]
+           disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  /* Badge */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+}
