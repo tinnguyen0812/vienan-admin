@@ -25,13 +25,9 @@ export const useAuthStore = create<AuthState>()(
       logout: () => set({ token: null, user: null, isAuthenticated: false }),
     }),
     {
-      name: 'vien-an-admin-auth', // localStorage key
-      onRehydrateStorage: () => (state) => {
-        // Re-derive isAuthenticated after hydration from localStorage
-        if (state) {
-          state.isAuthenticated = Boolean(state.token)
-        }
-      },
+      name: 'vien-an-admin-auth',
+      // onRehydrateStorage removed — isAuthenticated is persisted directly
+      // so no race condition between setAuth and rehydration
     },
   ),
 )
