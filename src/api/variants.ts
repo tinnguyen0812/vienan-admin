@@ -22,20 +22,31 @@ export interface ProductVariantPayload {
   isActive?: boolean
 }
 
+interface ApiWrapper<T> { success: boolean; data: T }
+
 export const variantsApi = {
   list: async (productId: string): Promise<ProductVariant[]> => {
-    const { data } = await apiClient.get<ProductVariant[]>(`/products/${productId}/variants`)
-    return data
+    const { data } = await apiClient.get<ApiWrapper<ProductVariant[]>>(
+      `/products/${productId}/variants`,
+    )
+    // Unwrap { success, data: [...] } from ResponseInterceptor
+    return Array.isArray(data.data) ? data.data : []
   },
 
   bulkCreate: async (productId: string, variants: Partial<ProductVariantPayload>[]): Promise<ProductVariant[]> => {
-    const { data } = await apiClient.post<ProductVariant[]>(`/products/${productId}/variants/bulk`, { variants })
-    return data
+    const { data } = await apiClient.post<ApiWrapper<ProductVariant[]>>(
+      `/products/${productId}/variants/bulk`,
+      { variants },
+    )
+    return Array.isArray(data.data) ? data.data : []
   },
 
   update: async (productId: string, variantId: string, dto: Partial<ProductVariantPayload>): Promise<ProductVariant> => {
-    const { data } = await apiClient.patch<ProductVariant>(`/products/${productId}/variants/${variantId}`, dto)
-    return data
+    const { data } = await apiClient.patch<ApiWrapper<ProductVariant>>(
+      `/products/${productId}/variants/${variantId}`,
+      dto,
+    )
+    return data.data
   },
 
   delete: async (productId: string, variantId: string): Promise<void> => {
