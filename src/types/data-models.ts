@@ -133,9 +133,8 @@ export interface LoginPayload {
 }
 
 export interface AuthResponse {
-  access_token: string
-  token_type: 'Bearer'
-  user?: User
+  accessToken: string
+  user: User
 }
 
 export type UserRole = 'SUPER_ADMIN' | 'ADMIN'

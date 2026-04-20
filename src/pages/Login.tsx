@@ -6,16 +6,9 @@ import { authApi } from '@/api/auth'
 import { useAuthStore } from '@/store/authStore'
 import type { User } from '@/types/data-models'
 
-// ─── Mock admin credentials (dev only) ───────────────────────────────────────
-const MOCK_EMAIL    = 'admin@vienan.vn'
-const MOCK_PASSWORD = 'admin123'
-const MOCK_TOKEN    = 'mock-jwt-token-vien-an-admin-dev'
-const MOCK_USER: User = {
-  id: 1,
-  email: MOCK_EMAIL,
-  role: 'ADMIN',
-  channelId: 1,
-}
+// ─── Quick-fill credentials (UAT) ───────────────────────────────────────────
+const QUICK_EMAIL    = 'admin@vienan.com'
+const QUICK_PASSWORD = 'Admin@123'
 
 export default function LoginPage() {
   const navigate = useNavigate()
@@ -29,8 +22,8 @@ export default function LoginPage() {
   // ─── Mutation ──────────────────────────────────────────────────────────────
   const loginMutation = useMutation({
     mutationFn: authApi.login,
-    onSuccess: ({ access_token, user }) => {
-      setAuth(access_token, user ?? null)
+    onSuccess: ({ accessToken, user }) => {
+      setAuth(accessToken, user ?? null)
       navigate('/', { replace: true })
     },
   })
@@ -47,26 +40,19 @@ export default function LoginPage() {
     return Object.keys(errors).length === 0
   }
 
-  // ─── Mock quick-fill ───────────────────────────────────────────────────────
+  // ─── Quick-fill ────────────────────────────────────────────────────────────
   function fillMock() {
-    setEmail(MOCK_EMAIL)
-    setPassword(MOCK_PASSWORD)
+    setEmail(QUICK_EMAIL)
+    setPassword(QUICK_PASSWORD)
     setFieldErrors({})
     loginMutation.reset()
   }
+
 
   // ─── Submit ────────────────────────────────────────────────────────────────
   function handleSubmit(e: FormEvent) {
     e.preventDefault()
     if (!validate()) return
-
-    // Mock bypass – skip API call when using dev credentials
-    if (email.trim() === MOCK_EMAIL && password === MOCK_PASSWORD) {
-      setAuth(MOCK_TOKEN, MOCK_USER)
-      navigate('/', { replace: true })
-      return
-    }
-
     loginMutation.mutate({ email: email.trim(), password })
   }
 
@@ -194,9 +180,9 @@ export default function LoginPage() {
           <div className="flex items-start gap-2.5">
             <Zap className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" strokeWidth={2} />
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-amber-700">Tài khoản mock (dev only)</p>
+              <p className="text-xs font-semibold text-amber-700">Tài khoản UAT</p>
               <p className="mt-0.5 text-[11px] text-amber-600 font-mono break-all">
-                {MOCK_EMAIL} / {MOCK_PASSWORD}
+                {QUICK_EMAIL} / {QUICK_PASSWORD}
               </p>
             </div>
             <button
