@@ -10,10 +10,16 @@ export interface TimestampedEntity {
 
 // ─── Category ────────────────────────────────────────────────────────────────
 
-export interface Category extends TimestampedEntity {
+export interface Category {
+  id: UUID
   name: string
   slug: string
-  description?: string
+  description?: string | null
+  imageUrl?: string | null
+  sortOrder: number
+  isActive: boolean
+  createdAt: string
+  updatedAt?: string
 }
 
 export interface CategoryPayload {
@@ -39,31 +45,41 @@ export interface ProductImage {
   display_order: number
 }
 
-export interface Product extends TimestampedEntity {
+export interface Product {
+  id: UUID
   name: string
-  slug: string
-  price: number          // VND
-  description?: string
-  material_info?: string // e.g. "100% Cotton Combed 30s"
-  size_guide_url?: string
-  shopee_link?: string
-  category_id: UUID
+  slug?: string | null
+  price: string
+  originalPrice: string | null
+  images: string[]
+  description?: string | null
+  materialInfo?: string | null
+  fabricWeight?: number | null
+  sizeGuideUrl?: string | null
+  shopeeLink?: string | null
+  sizes?: string[] | null
+  colors?: string[] | null
+  tags?: string[] | null
+  stock: number
+  soldCount: number
+  isActive: boolean
+  categoryId: UUID
   category?: Category
-  variants: ProductVariant[]
-  images: ProductImage[]
-  // Computed helpers (from backend)
-  total_stock: number
-  thumbnail?: string     // first image url
+  channelId: UUID
+  createdAt: string
+  updatedAt: string
+  variants?: ProductVariant[]
+  thumbnail?: string
 }
 
 export interface ProductPayload {
   name: string
   price: number
   description?: string
-  material_info?: string
-  size_guide_url?: string
-  shopee_link?: string
-  category_id: UUID
+  materialInfo?: string
+  sizeGuideUrl?: string
+  shopeeLink?: string
+  categoryId: UUID
   variants: ProductVariant[]
 }
 

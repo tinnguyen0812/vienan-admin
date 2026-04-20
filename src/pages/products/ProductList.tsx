@@ -8,8 +8,9 @@ import ProductForm from './ProductForm'
 
 const PAGE_SIZE = 10
 
-function formatCurrency(value: number) {
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(value)
+function formatCurrency(value: number | string) {
+  const amount = typeof value === 'string' ? Number(value) : value
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(Number.isNaN(amount) ? 0 : amount)
 }
 
 export default function ProductListPage() {
@@ -168,11 +169,11 @@ export default function ProductListPage() {
                 <tr key={product.id} className="border-t border-brand-border/70">
                   <td className="px-4 py-3 font-medium text-brand-black">{product.name}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{formatCurrency(product.price)}</td>
-                  <td className="px-4 py-3 text-right tabular-nums">{product.total_stock}</td>
+                  <td className="px-4 py-3 text-right tabular-nums">{product.stock}</td>
                   <td className="px-4 py-3">{product.category?.name ?? '-'}</td>
                   <td className="px-4 py-3">
-                    <span className={`badge ${product.total_stock > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
-                      {product.total_stock > 0 ? 'Đang bán' : 'Hết hàng'}
+                    <span className={`badge ${product.stock > 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-700'}`}>
+                      {product.stock > 0 ? 'Đang bán' : 'Hết hàng'}
                     </span>
                   </td>
                   <td className="px-4 py-3">

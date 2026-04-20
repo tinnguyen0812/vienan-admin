@@ -16,22 +16,22 @@ interface FormValues {
   name: string
   price: string
   stock: string
-  category_id: string
+  categoryId: string
   description: string
-  material_info: string
-  size_guide_url: string
-  shopee_link: string
+  materialInfo: string
+  sizeGuideUrl: string
+  shopeeLink: string
 }
 
 const DEFAULT_VALUES: FormValues = {
   name: '',
   price: '',
   stock: '0',
-  category_id: '',
+  categoryId: '',
   description: '',
-  material_info: '',
-  size_guide_url: '',
-  shopee_link: '',
+  materialInfo: '',
+  sizeGuideUrl: '',
+  shopeeLink: '',
 }
 
 function toFormValues(product?: Product | null): FormValues {
@@ -39,12 +39,12 @@ function toFormValues(product?: Product | null): FormValues {
   return {
     name: product.name,
     price: String(product.price),
-    stock: String(product.total_stock ?? 0),
-    category_id: product.category_id,
+    stock: String(product.stock ?? 0),
+    categoryId: product.categoryId,
     description: product.description ?? '',
-    material_info: product.material_info ?? '',
-    size_guide_url: product.size_guide_url ?? '',
-    shopee_link: product.shopee_link ?? '',
+    materialInfo: product.materialInfo ?? '',
+    sizeGuideUrl: product.sizeGuideUrl ?? '',
+    shopeeLink: product.shopeeLink ?? '',
   }
 }
 
@@ -90,11 +90,11 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
     return {
       name: values.name.trim(),
       price: Number(values.price),
-      category_id: values.category_id,
+      categoryId: values.categoryId,
       description: values.description.trim() || undefined,
-      material_info: values.material_info.trim() || undefined,
-      size_guide_url: values.size_guide_url.trim() || undefined,
-      shopee_link: values.shopee_link.trim() || undefined,
+      materialInfo: values.materialInfo.trim() || undefined,
+      sizeGuideUrl: values.sizeGuideUrl.trim() || undefined,
+      shopeeLink: values.shopeeLink.trim() || undefined,
       variants: [
         {
           color: 'Default',
@@ -109,17 +109,17 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
     return {
       name: values.name.trim(),
       price: Number(values.price),
-      category_id: values.category_id,
+      categoryId: values.categoryId,
       description: values.description.trim() || undefined,
-      material_info: values.material_info.trim() || undefined,
-      size_guide_url: values.size_guide_url.trim() || undefined,
-      shopee_link: values.shopee_link.trim() || undefined,
+      materialInfo: values.materialInfo.trim() || undefined,
+      sizeGuideUrl: values.sizeGuideUrl.trim() || undefined,
+      shopeeLink: values.shopeeLink.trim() || undefined,
     }
   }
 
   function validate() {
     if (!values.name.trim()) return 'Tên sản phẩm là bắt buộc.'
-    if (!values.category_id) return 'Vui lòng chọn danh mục.'
+    if (!values.categoryId) return 'Vui lòng chọn danh mục.'
     if (!values.price || Number.isNaN(Number(values.price)) || Number(values.price) < 0) {
       return 'Giá sản phẩm không hợp lệ.'
     }
@@ -166,8 +166,8 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
           <label className="mb-1 block text-xs font-medium text-brand-black">Danh mục</label>
           <select
             className="form-input"
-            value={values.category_id}
-            onChange={(e) => updateField('category_id', e.target.value)}
+            value={values.categoryId}
+            onChange={(e) => updateField('categoryId', e.target.value)}
             disabled={isSubmitting || categoriesQuery.isLoading}
           >
             <option value="">Chọn danh mục</option>
@@ -217,8 +217,8 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
           <label className="mb-1 block text-xs font-medium text-brand-black">Material info</label>
           <input
             className="form-input"
-            value={values.material_info}
-            onChange={(e) => updateField('material_info', e.target.value)}
+            value={values.materialInfo}
+            onChange={(e) => updateField('materialInfo', e.target.value)}
             disabled={isSubmitting}
           />
         </div>
@@ -226,8 +226,8 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
           <label className="mb-1 block text-xs font-medium text-brand-black">Size guide URL</label>
           <input
             className="form-input"
-            value={values.size_guide_url}
-            onChange={(e) => updateField('size_guide_url', e.target.value)}
+            value={values.sizeGuideUrl}
+            onChange={(e) => updateField('sizeGuideUrl', e.target.value)}
             disabled={isSubmitting}
           />
         </div>
@@ -235,8 +235,8 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
           <label className="mb-1 block text-xs font-medium text-brand-black">Shopee link</label>
           <input
             className="form-input"
-            value={values.shopee_link}
-            onChange={(e) => updateField('shopee_link', e.target.value)}
+            value={values.shopeeLink}
+            onChange={(e) => updateField('shopeeLink', e.target.value)}
             disabled={isSubmitting}
           />
         </div>
@@ -244,7 +244,7 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
 
       {isEditing && product && (
         <div className="rounded-xl border border-brand-border bg-brand-gray/30 p-4">
-          <VariantMatrix productId={product.id} productPrice={Number(values.price) || product.price} />
+          <VariantMatrix productId={product.id} productPrice={Number(values.price) || Number(product.price) || 0} />
         </div>
       )}
 

@@ -5,7 +5,6 @@ export interface ProductListParams {
   page?: number
   limit?: number
   search?: string
-  category_id?: string
   categoryId?: string
 }
 
@@ -41,7 +40,7 @@ export const productsApi = {
   list: async (params: ProductListParams = {}): Promise<PaginatedResponse<Product>> => {
     const normalizedParams = {
       ...params,
-      category_id: params.category_id ?? params.categoryId,
+      categoryId: params.categoryId,
     }
     const { data } = await apiClient.get<ApiWrapper<BackendPage<Product>>>(
       '/products/admin/list',
