@@ -10,17 +10,21 @@ export interface ProductListParams {
 }
 
 export const productsApi = {
+  /** Admin JWT endpoint — calls /products/admin/list (does NOT require API key) */
   list: async (params: ProductListParams = {}): Promise<PaginatedResponse<Product>> => {
     const normalizedParams = {
       ...params,
       category_id: params.category_id ?? params.categoryId,
     }
-    const { data } = await apiClient.get<PaginatedResponse<Product>>('/products', { params: normalizedParams })
+    const { data } = await apiClient.get<PaginatedResponse<Product>>('/products/admin/list', {
+      params: normalizedParams,
+    })
     return data
   },
 
+  /** Admin JWT endpoint — GET /products/admin/:id */
   get: async (id: string): Promise<Product> => {
-    const { data } = await apiClient.get<Product>(`/products/${id}`)
+    const { data } = await apiClient.get<Product>(`/products/admin/${id}`)
     return data
   },
 
