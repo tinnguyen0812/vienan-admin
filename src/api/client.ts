@@ -22,13 +22,21 @@ apiClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
 })
 
 // ─── Response interceptor – handle 401 ───────────────────────────────────────
+// Only auto-logout on 401 if the user was already authenticated.
+// Avoids boot-loop where Dashboard fires API calls before token is hydrated.
 
 apiClient.interceptors.response.use(
   (response) => response,
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      useAuthStore.getState().logout()
-      window.location.href = '/login'
+    const isLoginEndpoint = error.config?.url?.includes('/auth/login')
+    if (error.response?.status === 401 && !isLoginEndpoint) {
+      const { isAuthenticated, logout } = useAuthStore.getState()
+      // Only force-logout if user was considered authenticated
+      // (prevents redirect before initial hydration completes)
+      if (isAuthenticated) {
+        logout()
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   },
