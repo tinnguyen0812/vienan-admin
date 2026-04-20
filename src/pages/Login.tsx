@@ -4,7 +4,6 @@ import { useMutation } from '@tanstack/react-query'
 import { Eye, EyeOff, Loader2, Lock, Mail, ShieldCheck, Zap } from 'lucide-react'
 import { authApi } from '@/api/auth'
 import { useAuthStore } from '@/store/authStore'
-import type { User } from '@/types/data-models'
 
 // ─── Quick-fill credentials (UAT) ───────────────────────────────────────────
 const QUICK_EMAIL    = 'admin@vienan.com'
