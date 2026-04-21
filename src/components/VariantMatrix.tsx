@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Loader2, Save } from 'lucide-react'
+import { Loader2, Save, UploadCloud } from 'lucide-react'
 import { variantsApi } from '@/api/variants'
+import { uploadImageToCloudinary } from '@/lib/cloudinary'
 
 const SIZE_ORDER = ['S', 'M', 'L', 'XL', '2XL', '3XL'] as const
 
@@ -32,6 +33,7 @@ export function VariantMatrix({ productId, productPrice }: Props) {
   const [stockMap, setStockMap] = useState<Record<string, number>>({})
   const [skuMap, setSkuMap] = useState<Record<string, string>>({})
   const [colorImageMap, setColorImageMap] = useState<Record<string, string>>({})
+  const [uploadingColor, setUploadingColor] = useState<string | null>(null)
 
   const [bulkStock, setBulkStock] = useState<number>(0)
   const [bulkSku, setBulkSku] = useState<string>('')
@@ -43,6 +45,19 @@ export function VariantMatrix({ productId, productPrice }: Props) {
   })
 
   const variants = variantsQuery.data ?? []
+
+  const handleImageUpload = async (color: string, file: File) => {
+    setUploadingColor(color)
+    try {
+      const url = await uploadImageToCloudinary(file)
+      setColorImageMap((prev) => ({ ...prev, [color]: url }))
+    } catch (error) {
+      console.error('Upload failed:', error)
+      alert(error instanceof Error ? error.message : 'Upload failed')
+    } finally {
+      setUploadingColor(null)
+    }
+  }
 
   const handleBulkApply = () => {
     const nextStockMap = { ...stockMap }
@@ -311,17 +326,29 @@ export function VariantMatrix({ productId, productPrice }: Props) {
                             </div>
                           ) : (
                             <div className="flex h-12 w-12 items-center justify-center rounded border border-dashed border-brand-border bg-brand-gray/20 text-brand-muted">
-                              <span className="text-[10px]">No img</span>
+                              {uploadingColor === color ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : (
+                                <span className="text-[10px]">No img</span>
+                              )}
                             </div>
                           )}
                         </div>
-                        <input
-                          type="text"
-                          className="form-input h-7 px-2 py-1 text-[10px]"
-                          placeholder="Image URL..."
-                          value={colorImageMap[color] ?? ''}
-                          onChange={(e) => setColorImageMap((prev) => ({ ...prev, [color]: e.target.value }))}
-                        />
+                        <div className="flex items-center gap-1">
+                          <label className={`flex h-7 cursor-pointer items-center justify-center gap-1 rounded border border-brand-border bg-white px-2 text-[10px] hover:bg-brand-gray ${uploadingColor === color ? 'pointer-events-none opacity-50' : ''}`}>
+                            <UploadCloud className="h-3 w-3" />
+                            <span>Upload</span>
+                            <input
+                              type="file"
+                              className="hidden"
+                              accept="image/*"
+                              onChange={(e) => {
+                                const file = e.target.files?.[0]
+                                if (file) handleImageUpload(color, file)
+                              }}
+                            />
+                          </label>
+                        </div>
                       </div>
                     </td>
                     {SIZE_ORDER.map((size) => {
