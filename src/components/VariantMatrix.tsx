@@ -31,6 +31,10 @@ export function VariantMatrix({ productId, productPrice }: Props) {
   const [selectedSizes, setSelectedSizes] = useState<string[]>(['S', 'M', 'L', 'XL'])
   const [stockMap, setStockMap] = useState<Record<string, number>>({})
   const [skuMap, setSkuMap] = useState<Record<string, string>>({})
+  const [colorImageMap, setColorImageMap] = useState<Record<string, string>>({})
+
+  const [bulkStock, setBulkStock] = useState<number>(0)
+  const [bulkSku, setBulkSku] = useState<string>('')
 
   const variantsQuery = useQuery({
     queryKey: ['variants', productId],
@@ -40,15 +44,39 @@ export function VariantMatrix({ productId, productPrice }: Props) {
 
   const variants = variantsQuery.data ?? []
 
+  const handleBulkApply = () => {
+    const nextStockMap = { ...stockMap }
+    const nextSkuMap = { ...skuMap }
+
+    for (const key of desiredKeys) {
+      const [color, size] = key.split('|')
+      if (bulkStock > 0) {
+        nextStockMap[key] = bulkStock
+      }
+      if (bulkSku.trim()) {
+        const colorShort = color.normalize('NFD').replace(/[\u0300-\u036f]/g, '').slice(0, 3).toUpperCase()
+        nextSkuMap[key] = `${bulkSku.trim().toUpperCase()}-${colorShort}-${size}`
+      }
+    }
+
+    setStockMap(nextStockMap)
+    setSkuMap(nextSkuMap)
+  }
+
   useEffect(() => {
     const nextStockMap: Record<string, number> = {}
     const nextSkuMap: Record<string, string> = {}
+    const nextColorImageMap: Record<string, string> = {}
     const colors = new Set<string>()
     const sizes = new Set<string>()
 
     for (const variant of variants) {
-      nextStockMap[variantKey(variant.color, variant.size)] = variant.stock
-      nextSkuMap[variantKey(variant.color, variant.size)] = variant.sku
+      const key = variantKey(variant.color, variant.size)
+      nextStockMap[key] = variant.stock
+      nextSkuMap[key] = variant.sku
+      if (variant.imageUrl && !nextColorImageMap[variant.color]) {
+        nextColorImageMap[variant.color] = variant.imageUrl
+      }
       colors.add(variant.color)
       sizes.add(variant.size)
     }
@@ -62,6 +90,7 @@ export function VariantMatrix({ productId, productPrice }: Props) {
 
     setStockMap(nextStockMap)
     setSkuMap(nextSkuMap)
+    setColorImageMap(nextColorImageMap)
   }, [variants])
 
   const desiredKeys = useMemo(() => {
@@ -96,6 +125,7 @@ export function VariantMatrix({ productId, productPrice }: Props) {
         const colorCode = presetByName.get(color) ?? null
         const sku = skuMap[key] || `${color.slice(0, 3).toUpperCase()}-${size}`
         const stock = Number(stockMap[key] ?? 0)
+        const imageUrl = colorImageMap[color] || null
 
         if (existing) {
           await variantsApi.update(productId, existing.id, {
@@ -104,7 +134,7 @@ export function VariantMatrix({ productId, productPrice }: Props) {
             size,
             sku,
             stock,
-            imageUrl: existing.imageUrl,
+            imageUrl,
             isActive: stock > 0,
           })
         } else {
@@ -114,7 +144,7 @@ export function VariantMatrix({ productId, productPrice }: Props) {
             size,
             sku,
             stock,
-            imageUrl: null,
+            imageUrl,
             isActive: stock > 0,
           })
         }
@@ -196,6 +226,42 @@ export function VariantMatrix({ productId, productPrice }: Props) {
         </div>
       </div>
 
+      <div className="rounded-xl border border-dashed border-brand-border bg-brand-gray/10 p-4">
+        <div className="flex flex-wrap items-end gap-4">
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold uppercase text-brand-muted">Default Stock</label>
+            <input
+              type="number"
+              className="form-input h-9 w-24 px-3 text-sm"
+              placeholder="0"
+              value={bulkStock}
+              onChange={(e) => setBulkStock(Number(e.target.value))}
+            />
+          </div>
+          <div className="space-y-1.5">
+            <label className="text-[10px] font-semibold uppercase text-brand-muted">Base SKU</label>
+            <input
+              type="text"
+              className="form-input h-9 w-40 px-3 text-sm uppercase"
+              placeholder="e.g. POLO-01"
+              value={bulkSku}
+              onChange={(e) => setBulkSku(e.target.value)}
+            />
+          </div>
+          <button
+            type="button"
+            onClick={handleBulkApply}
+            className="h-9 rounded-lg bg-brand-black px-4 text-xs font-medium text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+            disabled={!bulkSku.trim() && bulkStock <= 0}
+          >
+            Áp dụng cho tất cả
+          </button>
+          <p className="pb-2 text-[10px] text-brand-muted italic">
+            * Sẽ áp dụng cho các ô đang được chọn (On)
+          </p>
+        </div>
+      </div>
+
       <div className="overflow-x-auto rounded-xl border border-brand-border bg-white">
         <table className="min-w-full border-collapse text-xs">
           <thead>
@@ -226,9 +292,36 @@ export function VariantMatrix({ productId, productPrice }: Props) {
                 return (
                   <tr key={color} className="align-top">
                     <td className="border-b border-brand-border px-3 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="h-3 w-3 rounded-full border border-brand-border" style={{ backgroundColor: colorDef?.code ?? '#ccc' }} />
-                        <span className="font-medium text-brand-black">{color}</span>
+                      <div className="flex flex-col gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className="h-3 w-3 rounded-full border border-brand-border" style={{ backgroundColor: colorDef?.code ?? '#ccc' }} />
+                          <span className="font-medium text-brand-black">{color}</span>
+                        </div>
+                        <div className="group relative">
+                          {colorImageMap[color] ? (
+                            <div className="relative h-12 w-12 overflow-hidden rounded border border-brand-border">
+                              <img src={colorImageMap[color]} alt={color} className="h-full w-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={() => setColorImageMap((prev) => ({ ...prev, [color]: '' }))}
+                                className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity group-hover:opacity-100"
+                              >
+                                <span className="text-[10px] text-white">Xóa</span>
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex h-12 w-12 items-center justify-center rounded border border-dashed border-brand-border bg-brand-gray/20 text-brand-muted">
+                              <span className="text-[10px]">No img</span>
+                            </div>
+                          )}
+                        </div>
+                        <input
+                          type="text"
+                          className="form-input h-7 px-2 py-1 text-[10px]"
+                          placeholder="Image URL..."
+                          value={colorImageMap[color] ?? ''}
+                          onChange={(e) => setColorImageMap((prev) => ({ ...prev, [color]: e.target.value }))}
+                        />
                       </div>
                     </td>
                     {SIZE_ORDER.map((size) => {
