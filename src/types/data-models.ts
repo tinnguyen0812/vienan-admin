@@ -82,6 +82,7 @@ export interface ProductPayload {
   sizeGuideUrl?: string
   shopeeLink?: string
   categoryId: UUID
+  channelId?: UUID
 }
 
 // ─── Order ───────────────────────────────────────────────────────────────────

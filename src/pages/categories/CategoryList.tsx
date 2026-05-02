@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Plus, Tag, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { categoriesApi } from '@/api/categories'
 
 export default function CategoryListPage() {
@@ -19,6 +20,10 @@ export default function CategoryListPage() {
       setName('')
       setDescription('')
       await queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success('Thêm danh mục thành công')
+    },
+    onError: () => {
+      toast.error('Không thể thêm danh mục')
     },
   })
 
@@ -26,6 +31,10 @@ export default function CategoryListPage() {
     mutationFn: categoriesApi.delete,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['categories'] })
+      toast.success('Xóa danh mục thành công')
+    },
+    onError: () => {
+      toast.error('Không thể xóa danh mục')
     },
   })
 

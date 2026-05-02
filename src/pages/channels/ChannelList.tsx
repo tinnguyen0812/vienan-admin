@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { Loader2, Plus, ShieldAlert, Trash2 } from 'lucide-react'
+import { toast } from 'sonner'
 import { channelsApi } from '@/api/channels'
 import { useAuthStore } from '@/store/authStore'
 
@@ -22,6 +23,10 @@ export default function ChannelListPage() {
       setName('')
       setCode('')
       await queryClient.invalidateQueries({ queryKey: ['channels'] })
+      toast.success('Tạo channel thành công')
+    },
+    onError: () => {
+      toast.error('Không thể tạo channel')
     },
   })
 
@@ -29,11 +34,21 @@ export default function ChannelListPage() {
     mutationFn: channelsApi.delete,
     onSuccess: async () => {
       await queryClient.invalidateQueries({ queryKey: ['channels'] })
+      toast.success('Xóa channel thành công')
+    },
+    onError: () => {
+      toast.error('Không thể xóa channel')
     },
   })
 
   const createApiKeyMutation = useMutation({
     mutationFn: channelsApi.createApiKey,
+    onSuccess: () => {
+      toast.success('Tạo API key thành công')
+    },
+    onError: () => {
+      toast.error('Không thể tạo API key')
+    },
   })
 
   function createChannel() {

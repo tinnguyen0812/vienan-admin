@@ -1,4 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { Toaster } from 'sonner'
 import { ProtectedRoute } from '@/router/ProtectedRoute'
 import { MainLayout } from '@/components/layout/MainLayout'
 import LoginPage        from '@/pages/Login'
@@ -13,6 +14,7 @@ import ChannelListPage  from '@/pages/channels/ChannelList'
 export default function App() {
   return (
     <BrowserRouter>
+      <Toaster position="top-right" richColors closeButton />
       <Routes>
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
