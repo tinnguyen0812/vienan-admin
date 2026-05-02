@@ -75,6 +75,7 @@ export interface Product {
 export interface ProductPayload {
   name: string
   price: number
+  stock?: number
   images?: string[]
   description?: string
   materialInfo?: string

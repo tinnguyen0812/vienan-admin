@@ -15,6 +15,7 @@ interface ProductFormProps {
 interface FormValues {
   name: string
   price: string
+  stock: string
   categoryId: string
   description: string
   materialInfo: string
@@ -25,6 +26,7 @@ interface FormValues {
 const DEFAULT_VALUES: FormValues = {
   name: '',
   price: '',
+  stock: '0',
   categoryId: '',
   description: '',
   materialInfo: '',
@@ -37,6 +39,7 @@ function toFormValues(product?: Product | null): FormValues {
   return {
     name: product.name,
     price: String(product.price),
+    stock: String(product.stock ?? 0),
     categoryId: product.categoryId,
     description: product.description ?? '',
     materialInfo: product.materialInfo ?? '',
@@ -87,6 +90,7 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
     return {
       name: values.name.trim(),
       price: Number(values.price),
+      stock: Number(values.stock) || 0,
       categoryId: values.categoryId,
       description: values.description.trim() || undefined,
       materialInfo: values.materialInfo.trim() || undefined,
@@ -172,6 +176,18 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
             min={0}
             value={values.price}
             onChange={(e) => updateField('price', e.target.value)}
+            disabled={isSubmitting}
+          />
+        </div>
+
+        <div>
+          <label className="mb-1 block text-xs font-medium text-brand-black">Tồn kho ban đầu</label>
+          <input
+            className="form-input"
+            type="number"
+            min={0}
+            value={values.stock}
+            onChange={(e) => updateField('stock', e.target.value)}
             disabled={isSubmitting}
           />
         </div>
