@@ -75,12 +75,12 @@ export interface Product {
 export interface ProductPayload {
   name: string
   price: number
+  images?: string[]
   description?: string
   materialInfo?: string
   sizeGuideUrl?: string
   shopeeLink?: string
   categoryId: UUID
-  variants: ProductVariant[]
 }
 
 // ─── Order ───────────────────────────────────────────────────────────────────

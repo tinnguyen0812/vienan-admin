@@ -15,7 +15,6 @@ interface ProductFormProps {
 interface FormValues {
   name: string
   price: string
-  stock: string
   categoryId: string
   description: string
   materialInfo: string
@@ -26,7 +25,6 @@ interface FormValues {
 const DEFAULT_VALUES: FormValues = {
   name: '',
   price: '',
-  stock: '0',
   categoryId: '',
   description: '',
   materialInfo: '',
@@ -39,7 +37,6 @@ function toFormValues(product?: Product | null): FormValues {
   return {
     name: product.name,
     price: String(product.price),
-    stock: String(product.stock ?? 0),
     categoryId: product.categoryId,
     description: product.description ?? '',
     materialInfo: product.materialInfo ?? '',
@@ -95,13 +92,6 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
       materialInfo: values.materialInfo.trim() || undefined,
       sizeGuideUrl: values.sizeGuideUrl.trim() || undefined,
       shopeeLink: values.shopeeLink.trim() || undefined,
-      variants: [
-        {
-          color: 'Default',
-          size: 'M',
-          stock: Number(values.stock),
-        },
-      ]
     }
   }
 
@@ -122,9 +112,6 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
     if (!values.categoryId) return 'Vui lòng chọn danh mục.'
     if (!values.price || Number.isNaN(Number(values.price)) || Number(values.price) < 0) {
       return 'Giá sản phẩm không hợp lệ.'
-    }
-    if (!values.stock || Number.isNaN(Number(values.stock)) || Number(values.stock) < 0) {
-      return 'Tồn kho không hợp lệ.'
     }
     return null
   }
@@ -185,18 +172,6 @@ export default function ProductForm({ product, onSuccess, onCancel }: ProductFor
             min={0}
             value={values.price}
             onChange={(e) => updateField('price', e.target.value)}
-            disabled={isSubmitting}
-          />
-        </div>
-
-        <div>
-          <label className="mb-1 block text-xs font-medium text-brand-black">Tồn kho</label>
-          <input
-            className="form-input"
-            type="number"
-            min={0}
-            value={values.stock}
-            onChange={(e) => updateField('stock', e.target.value)}
             disabled={isSubmitting}
           />
         </div>
