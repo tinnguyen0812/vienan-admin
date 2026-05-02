@@ -140,7 +140,6 @@ export function VariantMatrix({ productId, productPrice }: Props) {
         const colorCode = presetByName.get(color) ?? null
         const sku = skuMap[key] || `${color.slice(0, 3).toUpperCase()}-${size}`
         const stock = Number(stockMap[key] ?? 0)
-        const imageUrl = colorImageMap[color] || null
 
         if (existing) {
           await variantsApi.update(productId, existing.id, {
@@ -149,8 +148,10 @@ export function VariantMatrix({ productId, productPrice }: Props) {
             size,
             sku,
             stock,
-            imageUrl,
             isActive: stock > 0,
+            // Chỉ gửi imageUrl khi user đã upload ảnh mới trong session này.
+            // Không gửi null để tránh xóa URL đang có trong DB.
+            ...(colorImageMap[color] ? { imageUrl: colorImageMap[color] } : {}),
           })
         } else {
           createPayload.push({
@@ -159,7 +160,7 @@ export function VariantMatrix({ productId, productPrice }: Props) {
             size,
             sku,
             stock,
-            imageUrl,
+            imageUrl: colorImageMap[color] || null,
             isActive: stock > 0,
           })
         }
