@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { Edit, Loader2, Package, Plus, Search, Trash2 } from 'lucide-react'
+import { Edit, Image as ImageIcon, Loader2, Package, Plus, Search, Trash2 } from 'lucide-react'
 import { categoriesApi } from '@/api/categories'
 import { productsApi } from '@/api/products'
 import type { Product } from '@/types/data-models'
@@ -134,7 +134,7 @@ export default function ProductListPage() {
           <table className="min-w-full text-sm">
             <thead className="bg-brand-gray/70 text-xs uppercase tracking-wide text-brand-muted">
               <tr>
-                <th className="px-4 py-3 text-left">Tên</th>
+                <th className="px-4 py-3 text-left">Sản phẩm</th>
                 <th className="px-4 py-3 text-right">Giá</th>
                 <th className="px-4 py-3 text-right">Tồn kho</th>
                 <th className="px-4 py-3 text-left">Danh mục</th>
@@ -165,9 +165,23 @@ export default function ProductListPage() {
                 </tr>
               )}
 
-              {products.map((product) => (
+              {products.map((product) => {
+                const thumbnailUrl = product.image ?? product.images?.[0]
+                
+                return (
                 <tr key={product.id} className="border-t border-brand-border/70">
-                  <td className="px-4 py-3 font-medium text-brand-black">{product.name}</td>
+                  <td className="px-4 py-3">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded border border-brand-border bg-brand-gray/50">
+                        {thumbnailUrl ? (
+                          <img src={thumbnailUrl} alt={product.name} className="h-full w-full object-cover" />
+                        ) : (
+                          <ImageIcon className="h-4 w-4 text-brand-muted" strokeWidth={1.5} />
+                        )}
+                      </div>
+                      <span className="font-medium text-brand-black line-clamp-2">{product.name}</span>
+                    </div>
+                  </td>
                   <td className="px-4 py-3 text-right tabular-nums">{formatCurrency(product.price)}</td>
                   <td className="px-4 py-3 text-right tabular-nums">{product.stock}</td>
                   <td className="px-4 py-3">{product.category?.name ?? '-'}</td>
@@ -189,7 +203,7 @@ export default function ProductListPage() {
                     </div>
                   </td>
                 </tr>
-              ))}
+              )})}
             </tbody>
           </table>
         </div>
